@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Fix diff added/removed being swapped
+- Fix to_json to accept optional file path
+- Fix include/exclude filters to accept list of patterns
+
 ## 0.1.1
 
 - Add project URLs to pyproject.toml
