@@ -1,5 +1,9 @@
 # philiprehberger-dir-snapshot
 
+[![Tests](https://github.com/philiprehberger/py-dir-snapshot/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-dir-snapshot/actions/workflows/publish.yml)
+[![PyPI version](https://img.shields.io/pypi/v/philiprehberger-dir-snapshot.svg)](https://pypi.org/project/philiprehberger-dir-snapshot/)
+[![License](https://img.shields.io/github/license/philiprehberger/py-dir-snapshot)](LICENSE)
+
 Filesystem state snapshots with diff comparison.
 
 ## Installation
