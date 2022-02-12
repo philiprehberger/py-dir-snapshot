@@ -72,6 +72,14 @@ snap = snapshot(".", hash_mode="md5")
 - `Snapshot.to_json(path)` / `Snapshot.from_json(path)` — Serialize/deserialize
 - `SnapshotDiff.summary()` — Human-readable diff summary
 
+
+## Development
+
+```bash
+pip install -e .
+python -m pytest tests/ -v
+```
+
 ## License
 
 MIT
