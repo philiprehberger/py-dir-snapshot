@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Add pytest and mypy tool configuration to pyproject.toml
+
 ## 0.2.0
 
 - Trim keywords to match pyproject template guide

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "philiprehberger-dir-snapshot"
-version = "0.2.0"
+version = "0.2.1"
 description = "Filesystem state snapshots with diff comparison"
 readme = "README.md"
 license = "MIT"
@@ -31,3 +31,9 @@ Changelog = "https://github.com/philiprehberger/py-dir-snapshot/blob/main/CHANGE
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/philiprehberger_dir_snapshot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+strict = true
