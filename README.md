@@ -67,10 +67,15 @@ snap = snapshot(".", hash_mode="md5")
 
 ## API
 
-- `snapshot(path, hash_mode="sha256", include=None, exclude=None)` — Create a snapshot
-- `Snapshot.diff(other)` — Compare two snapshots, returns `SnapshotDiff`
-- `Snapshot.to_json(path)` / `Snapshot.from_json(path)` — Serialize/deserialize
-- `SnapshotDiff.summary()` — Human-readable diff summary
+| Function / Class | Description |
+|------------------|-------------|
+| `snapshot(path, hash_mode="mtime", include=None, exclude=None)` | Create a directory snapshot |
+| `Snapshot.diff(other)` | Compare two snapshots, returns `SnapshotDiff` |
+| `Snapshot.to_json(path)` / `Snapshot.from_json(path)` | Serialize/deserialize |
+| `FileEntry` | File metadata — `.path`, `.size`, `.mtime`, `.hash` |
+| `SnapshotDiff.has_changes` | `True` if any files were added, removed, or modified |
+| `SnapshotDiff.added` / `.removed` / `.modified` / `.unchanged` | Lists of file paths |
+| `SnapshotDiff.summary()` | Human-readable diff summary |
 
 
 ## Development
