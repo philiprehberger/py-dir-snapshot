@@ -2,8 +2,7 @@
 
 [![Tests](https://github.com/philiprehberger/py-dir-snapshot/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-dir-snapshot/actions/workflows/publish.yml)
 [![PyPI version](https://img.shields.io/pypi/v/philiprehberger-dir-snapshot.svg)](https://pypi.org/project/philiprehberger-dir-snapshot/)
-[![License](https://img.shields.io/github/license/philiprehberger/py-dir-snapshot)](LICENSE)
-[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
+[![Last updated](https://img.shields.io/github/last-commit/philiprehberger/py-dir-snapshot)](https://github.com/philiprehberger/py-dir-snapshot/commits/main)
 
 Filesystem state snapshots with diff comparison.
 
@@ -78,7 +77,6 @@ snap = snapshot(".", hash_mode="md5")
 | `SnapshotDiff.added` / `.removed` / `.modified` / `.unchanged` | Lists of file paths |
 | `SnapshotDiff.summary()` | Human-readable diff summary |
 
-
 ## Development
 
 ```bash
@@ -86,6 +84,24 @@ pip install -e .
 python -m pytest tests/ -v
 ```
 
+## Support
+
+If you find this project useful:
+
+⭐ [Star the repo](https://github.com/philiprehberger/py-dir-snapshot)
+
+🐛 [Report issues](https://github.com/philiprehberger/py-dir-snapshot/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+
+💡 [Suggest features](https://github.com/philiprehberger/py-dir-snapshot/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+
+❤️ [Sponsor development](https://github.com/sponsors/philiprehberger)
+
+🌐 [All Open Source Projects](https://philiprehberger.com/open-source-packages)
+
+💻 [GitHub Profile](https://github.com/philiprehberger)
+
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/philiprehberger)
+
 ## License
 
-MIT
+[MIT](LICENSE)
