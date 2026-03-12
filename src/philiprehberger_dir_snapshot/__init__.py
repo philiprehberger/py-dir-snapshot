@@ -122,7 +122,10 @@ class Snapshot:
 
     @classmethod
     def from_json(cls, data: str) -> Snapshot:
-        """Deserialize a snapshot from a JSON string."""
+        """Deserialize a snapshot from a JSON string or file path."""
+        p = Path(data)
+        if p.exists() and p.is_file():
+            data = p.read_text(encoding="utf-8")
         parsed = json.loads(data)
         files = {
             k: FileEntry(**v)
