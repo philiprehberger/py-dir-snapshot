@@ -82,9 +82,9 @@ class Snapshot:
         all_paths = set(self.files) | set(other.files)
 
         for path in sorted(all_paths):
-            if path not in other.files:
+            if path not in self.files:
                 result.added.append(path)
-            elif path not in self.files:
+            elif path not in other.files:
                 result.removed.append(path)
             else:
                 old = other.files[path]
@@ -101,14 +101,24 @@ class Snapshot:
 
         return result
 
-    def to_json(self) -> str:
-        """Serialize the snapshot to a JSON string."""
+    def to_json(self, path: str | Path | None = None) -> str:
+        """Serialize the snapshot to a JSON string, optionally writing to a file.
+
+        Args:
+            path: If provided, write the JSON to this file path.
+
+        Returns:
+            The JSON string.
+        """
         data = {
             "path": self.path,
             "created_at": self.created_at,
             "files": {k: asdict(v) for k, v in self.files.items()},
         }
-        return json.dumps(data, indent=2)
+        result = json.dumps(data, indent=2)
+        if path is not None:
+            Path(path).write_text(result, encoding="utf-8")
+        return result
 
     @classmethod
     def from_json(cls, data: str) -> Snapshot:
@@ -128,8 +138,8 @@ class Snapshot:
 def snapshot(
     path: str | Path,
     hash_mode: str = "mtime",
-    include: str | None = None,
-    exclude: str | None = None,
+    include: str | list[str] | None = None,
+    exclude: str | list[str] | None = None,
 ) -> Snapshot:
     """Capture the current state of a directory.
 
@@ -156,10 +166,14 @@ def snapshot(
 
         relative = str(file_path.relative_to(root)).replace("\\", "/")
 
-        if include and not fnmatch(relative, include):
-            continue
-        if exclude and fnmatch(relative, exclude):
-            continue
+        if include:
+            patterns = [include] if isinstance(include, str) else include
+            if not any(fnmatch(relative, p) for p in patterns):
+                continue
+        if exclude:
+            patterns = [exclude] if isinstance(exclude, str) else exclude
+            if any(fnmatch(relative, p) for p in patterns):
+                continue
 
         stat = file_path.stat()
         file_hash: str | None = None
