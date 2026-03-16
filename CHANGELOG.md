@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+
+- Add Development section to README
+
 ## 0.1.3
 
 - Fix from_json to accept file path argument
