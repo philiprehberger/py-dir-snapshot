@@ -67,10 +67,12 @@ snap = snapshot(".", hash_mode="md5")
 
 ## API
 
-- `snapshot(path, hash_mode="sha256", include=None, exclude=None)` — Create a snapshot
-- `Snapshot.diff(other)` — Compare two snapshots, returns `SnapshotDiff`
-- `Snapshot.to_json(path)` / `Snapshot.from_json(path)` — Serialize/deserialize
-- `SnapshotDiff.summary()` — Human-readable diff summary
+| Function / Class | Description |
+|------------------|-------------|
+| `snapshot(path, hash_mode="sha256", include=None, exclude=None)` | Create a snapshot |
+| `Snapshot.diff(other)` | Compare two snapshots, returns `SnapshotDiff` |
+| `Snapshot.to_json(path)` / `Snapshot.from_json(path)` | Serialize/deserialize |
+| `SnapshotDiff.summary()` | Human-readable diff summary |
 
 
 ## Development
