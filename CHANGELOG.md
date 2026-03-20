@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7
+
+- Trim keywords to match pyproject template guide
+
 ## 0.1.6
 
 - Add Development section to README
