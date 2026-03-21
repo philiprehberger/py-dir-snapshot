@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+- Convert API section to table format
+- Document FileEntry, SnapshotDiff.has_changes, and SnapshotDiff field lists
+
 ## 0.2.1
 
 - Add pytest and mypy tool configuration to pyproject.toml
