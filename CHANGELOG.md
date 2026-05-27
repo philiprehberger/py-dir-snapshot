@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 (2026-05-26)
+
+- Add `Snapshot.verify()` returning a `VerifyReport` — re-checks every stored entry against disk to confirm files still exist and content matches. Useful for backup verification and tamper detection.
+- Add package-card image to README
+
 ## 0.2.3 (2026-03-31)
 
 - Standardize README to 3-badge format with emoji Support section

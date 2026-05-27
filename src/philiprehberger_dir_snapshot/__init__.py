@@ -15,6 +15,7 @@ __all__ = [
     "Snapshot",
     "SnapshotDiff",
     "FileEntry",
+    "VerifyReport",
 ]
 
 
@@ -54,6 +55,34 @@ class SnapshotDiff:
         if self.unchanged:
             parts.append(f"{len(self.unchanged)} unchanged")
         return ", ".join(parts) if parts else "Empty snapshot"
+
+
+@dataclass
+class VerifyReport:
+    """Result of re-checking a snapshot against the filesystem."""
+
+    missing: list[str] = field(default_factory=list)
+    """Files recorded in the snapshot but no longer on disk."""
+
+    modified: list[str] = field(default_factory=list)
+    """Files whose on-disk content no longer matches the stored hash/metadata."""
+
+    verified: list[str] = field(default_factory=list)
+    """Files whose on-disk content matches the snapshot."""
+
+    @property
+    def is_intact(self) -> bool:
+        """``True`` when nothing is missing or modified."""
+        return not (self.missing or self.modified)
+
+    def summary(self) -> str:
+        """Return a human-readable summary."""
+        parts: list[str] = [f"{len(self.verified)} verified"]
+        if self.missing:
+            parts.append(f"{len(self.missing)} missing")
+        if self.modified:
+            parts.append(f"{len(self.modified)} modified")
+        return ", ".join(parts)
 
 
 @dataclass
@@ -100,6 +129,56 @@ class Snapshot:
                     result.unchanged.append(path)
 
         return result
+
+    def verify(self, *, strict: bool = False) -> VerifyReport:
+        """Re-scan the snapshot's root directory and confirm every entry still matches.
+
+        Useful for backup verification and tamper detection: walks each file
+        recorded in the snapshot, re-checks it against disk, and reports which
+        entries are missing or modified. Files added to the directory *after*
+        the snapshot was taken are ignored — use :meth:`diff` for that case.
+
+        Args:
+            strict: When ``True``, raise :class:`FileNotFoundError` if the
+                snapshot's root directory itself is gone. When ``False``
+                (default), every entry simply ends up in ``missing``.
+
+        Returns:
+            A :class:`VerifyReport` listing verified, missing, and modified paths.
+        """
+        report = VerifyReport()
+        root = Path(self.path)
+
+        if not root.is_dir():
+            if strict:
+                msg = f"Snapshot root no longer exists: {root}"
+                raise FileNotFoundError(msg)
+            report.missing.extend(sorted(self.files))
+            return report
+
+        for rel_path, entry in self.files.items():
+            on_disk = root / rel_path
+            if not on_disk.is_file():
+                report.missing.append(rel_path)
+                continue
+
+            stat = on_disk.stat()
+            if entry.hash is not None:
+                h = hashlib.sha256()
+                with open(on_disk, "rb") as f:
+                    while chunk := f.read(8192):
+                        h.update(chunk)
+                if h.hexdigest() != entry.hash:
+                    report.modified.append(rel_path)
+                else:
+                    report.verified.append(rel_path)
+            else:
+                if stat.st_size != entry.size or stat.st_mtime != entry.mtime:
+                    report.modified.append(rel_path)
+                else:
+                    report.verified.append(rel_path)
+
+        return report
 
     def to_json(self, path: str | Path | None = None) -> str:
         """Serialize the snapshot to a JSON string, optionally writing to a file.

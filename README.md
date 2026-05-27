@@ -4,6 +4,8 @@
 [![PyPI version](https://img.shields.io/pypi/v/philiprehberger-dir-snapshot.svg)](https://pypi.org/project/philiprehberger-dir-snapshot/)
 [![Last updated](https://img.shields.io/github/last-commit/philiprehberger/py-dir-snapshot)](https://github.com/philiprehberger/py-dir-snapshot/commits/main)
 
+![philiprehberger-dir-snapshot](https://raw.githubusercontent.com/philiprehberger/py-dir-snapshot/main/package-card.webp)
+
 Filesystem state snapshots with diff comparison.
 
 ## Installation
@@ -65,13 +67,35 @@ snap = snapshot(".", exclude=["__pycache__", "*.pyc", ".git"])
 snap = snapshot(".", hash_mode="md5")
 ```
 
+### Verify a Snapshot
+
+Re-check that every file recorded in a snapshot is still on disk and unchanged — useful for backup verification or detecting silent corruption.
+
+```python
+snap = snapshot("./backup", hash_mode="sha256")
+# ... time passes / backup is restored ...
+
+report = snap.verify()
+if report.is_intact:
+    print("backup intact")
+else:
+    print(report.summary())
+    for path in report.missing:
+        print(f"missing: {path}")
+    for path in report.modified:
+        print(f"corrupt: {path}")
+```
+
 ## API
 
 | Function / Class | Description |
 |------------------|-------------|
 | `snapshot(path, hash_mode="mtime", include=None, exclude=None)` | Create a directory snapshot |
 | `Snapshot.diff(other)` | Compare two snapshots, returns `SnapshotDiff` |
+| `Snapshot.verify(strict=False)` | Re-check stored entries against disk; returns `VerifyReport` |
 | `Snapshot.to_json(path)` / `Snapshot.from_json(path)` | Serialize/deserialize |
+| `VerifyReport.is_intact` | `True` when nothing is missing or modified |
+| `VerifyReport.verified` / `.missing` / `.modified` | File path lists |
 | `FileEntry` | File metadata — `.path`, `.size`, `.mtime`, `.hash` |
 | `SnapshotDiff.has_changes` | `True` if any files were added, removed, or modified |
 | `SnapshotDiff.added` / `.removed` / `.modified` / `.unchanged` | Lists of file paths |

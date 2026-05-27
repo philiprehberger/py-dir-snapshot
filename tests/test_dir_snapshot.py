@@ -52,9 +52,9 @@ def test_snapshot_diff_modified():
     with tempfile.TemporaryDirectory() as tmpdir:
         f = Path(tmpdir) / "file.txt"
         f.write_text("v1")
-        snap1 = snapshot(tmpdir)
-        f.write_text("v2")
-        snap2 = snapshot(tmpdir)
+        snap1 = snapshot(tmpdir, hash_mode="sha256")
+        f.write_text("v2-larger")
+        snap2 = snapshot(tmpdir, hash_mode="sha256")
         diff = snap1.diff(snap2)
         assert len(diff.modified) == 1
 
@@ -95,3 +95,85 @@ def test_summary():
         diff = snap1.diff(snap2)
         summary = diff.summary()
         assert isinstance(summary, str)
+
+
+def test_verify_intact_with_sha256():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("hello")
+        (Path(tmpdir) / "b.txt").write_text("world")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+        report = snap.verify()
+        assert report.is_intact
+        assert sorted(report.verified) == ["a.txt", "b.txt"]
+        assert report.missing == []
+        assert report.modified == []
+
+
+def test_verify_detects_modified_with_sha256():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        target = Path(tmpdir) / "a.txt"
+        target.write_text("original")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+        target.write_text("tampered")
+
+        report = snap.verify()
+        assert not report.is_intact
+        assert report.modified == ["a.txt"]
+        assert report.verified == []
+
+
+def test_verify_detects_missing():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("hi")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+        (Path(tmpdir) / "a.txt").unlink()
+
+        report = snap.verify()
+        assert report.missing == ["a.txt"]
+        assert report.verified == []
+
+
+def test_verify_ignores_new_files_added_after_snapshot():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("hi")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+        (Path(tmpdir) / "new.txt").write_text("appeared later")
+
+        report = snap.verify()
+        assert report.is_intact
+        assert "new.txt" not in report.verified
+        assert "new.txt" not in report.modified
+
+
+def test_verify_root_missing_returns_all_missing_by_default():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("x")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+    report = snap.verify()
+    assert report.missing == ["a.txt"]
+    assert not report.is_intact
+
+
+def test_verify_root_missing_with_strict_raises():
+    import pytest
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("x")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+    with pytest.raises(FileNotFoundError):
+        snap.verify(strict=True)
+
+
+def test_verify_summary_format():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        (Path(tmpdir) / "a.txt").write_text("x")
+        snap = snapshot(tmpdir, hash_mode="sha256")
+
+        report = snap.verify()
+        assert "verified" in report.summary()
